@@ -1,4 +1,4 @@
-# KIMY — Sistema de Revisión Inteligente de Tesis
+Sistema de Revisión Inteligente de Tesis
 
 Sistema web completo para la gestión, revisión y evaluación automatizada de avances de tesis universitarias con inteligencia artificial.
 
