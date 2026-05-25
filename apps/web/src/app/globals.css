@@ -208,3 +208,50 @@ html {
     @apply font-sans;
   }
 }
+
+/* ============================
+   GLOBAL DARK MODE OVERRIDES
+   ============================ */
+.dark .bg-white {
+  background-color: var(--surface) !important;
+}
+
+.dark .text-gray-900,
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-gray-800 {
+  color: var(--text-primary) !important;
+}
+
+.dark .text-gray-700,
+.dark .text-slate-700,
+.dark .text-gray-600,
+.dark .text-slate-600 {
+  color: var(--text-secondary) !important;
+}
+
+.dark .text-gray-500,
+.dark .text-slate-500,
+.dark .text-gray-400,
+.dark .text-slate-400 {
+  color: var(--text-muted) !important;
+}
+
+.dark .border-gray-100,
+.dark .border-gray-200,
+.dark .border-slate-100,
+.dark .border-slate-200 {
+  border-color: var(--border-color) !important;
+}
+
+.dark .bg-gray-50,
+.dark .bg-gray-100,
+.dark .bg-slate-50,
+.dark .bg-slate-100 {
+  background-color: var(--surface-2) !important;
+}
+
+.dark .hover\:bg-gray-50:hover,
+.dark .hover\:bg-slate-50:hover {
+  background-color: var(--surface-2) !important;
+}
