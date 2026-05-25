@@ -1,20 +1,20 @@
-# 🎓 KIMY — Sistema de Revisión Inteligente de Tesis
+# KIMY — Sistema de Revisión Inteligente de Tesis
 
 Sistema web completo para la gestión, revisión y evaluación automatizada de avances de tesis universitarias con inteligencia artificial.
 
-## ✨ Características
+## Características
 
-- **🤖 Análisis IA con GPT-4o**: Evaluación automática de estructura, contenido, forma y originalidad
-- **📊 Dashboard con KPIs**: Vista general con métricas en tiempo real
-- **📝 Retroalimentación accionable**: Hallazgos con instrucciones de corrección y ejemplos de mejora
-- **🔍 Detección de plagio**: Comparación de embeddings con pgvector (similitud coseno)
-- **📚 Validación de citas**: Verificación automática de referencias con CrossRef API
-- **🎯 Fine-tuning continuo**: Aprendizaje del feedback humano para mejorar el modelo
-- **🔗 Integración ORCID**: Vinculación de perfiles académicos de asesores
-- **📱 App móvil (Expo)**: Visualización de hallazgos para estudiantes
-- **📄 Reportes PDF**: Actas de revisión con evaluación IA + ajustes humanos
+- **Análisis IA con GPT-4o**: Evaluación automática de estructura, contenido, forma y originalidad
+- **Dashboard con KPIs**: Vista general con métricas en tiempo real
+- **Retroalimentación accionable**: Hallazgos con instrucciones de corrección y ejemplos de mejora
+- **Detección de plagio**: Comparación de embeddings con pgvector (similitud coseno)
+- **Validación de citas**: Verificación automática de referencias con CrossRef API
+- **Fine-tuning continuo**: Aprendizaje del feedback humano para mejorar el modelo
+- **Integración ORCID**: Vinculación de perfiles académicos de asesores
+- **App móvil (Expo)**: Visualización de hallazgos para estudiantes
+- **Reportes PDF**: Actas de revisión con evaluación IA + ajustes humanos
 
-## 🏗️ Stack Tecnológico
+## Stack Tecnológico
 
 | Componente | Tecnología |
 |------------|------------|
@@ -29,7 +29,7 @@ Sistema web completo para la gestión, revisión y evaluación automatizada de a
 | Mobile | Expo SDK 52, React Native |
 | Contenedores | Docker Compose |
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 kimy/
@@ -46,7 +46,7 @@ kimy/
 └── .env.example
 ```
 
-## 🚀 Instalación y Ejecución
+## Instalación y Ejecución
 
 ### Prerequisitos
 - Node.js >= 20
@@ -107,13 +107,13 @@ npm run dev
 | asesor1@kimy.edu | Kimy2026! | Asesor |
 | estudiante1@kimy.edu | Kimy2026! | Estudiante |
 
-## 📐 Arquitectura
+## Arquitectura
 
 ```
 ┌─────────────┐     ┌──────────────┐     ┌──────────────┐
 │  Next.js 15  │────▶│  NestJS API  │────▶│ PostgreSQL   │
 │  Frontend    │     │  Backend     │     │ + pgvector   │
-└─────────────┘     └──────┬───────┘     └──────────────┘
+└─────────────┐     └──────┬───────┘     └──────────────┘
                            │
                     ┌──────┴───────┐
                     │   Workers    │
@@ -128,7 +128,7 @@ npm run dev
          └────────┘  └────────┘  └────────┘
 ```
 
-## 🤖 Pipeline de IA
+## Pipeline de IA
 
 1. **Extracción**: mammoth.js (DOCX) / pdf-parse (PDF)
 2. **Chunking**: RecursiveCharacterTextSplitter (1500 tokens)
@@ -136,7 +136,7 @@ npm run dev
 4. **Análisis**: GPT-4o con prompt especializado en evaluación académica
 5. **Output**: Scores por dimensión + hallazgos con correcciones + nota
 
-## 📊 Módulos
+## Módulos
 
 1. **Autenticación**: JWT + roles (Student, Advisor, Coordinator, Admin)
 2. **Documentos Patrón**: Carga y versionado de templates institucionales
@@ -151,6 +151,6 @@ npm run dev
 11. **Dashboard**: KPIs y estadísticas
 12. **Notificaciones**: In-app y push (Expo)
 
-## 📝 Licencia
+## Licencia
 
 Proyecto académico — LAB01 HLJA
