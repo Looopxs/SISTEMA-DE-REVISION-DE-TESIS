@@ -1,0 +1,33 @@
+# render.yaml — Configuración de despliegue en Render.com
+# Repositorio: https://github.com/Looopxs/LAB01_HLJA
+
+services:
+  # ============================================================
+  # BACKEND — NestJS API (Web Service en Render)
+  # ============================================================
+  - type: web
+    name: jorana-ia-api
+    runtime: node
+    region: oregon          # Región más cercana a Latinoamérica disponible en plan gratis
+    plan: free
+
+    # Render ejecuta los comandos desde la RAÍZ del repositorio
+    buildCommand: |
+      npm install
+      cd apps/api && npx nest build
+
+    startCommand: node apps/api/dist/main.js
+
+    # Variables de entorno que debes configurar en el dashboard de Render:
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_PORT
+        value: 3001
+      # Las siguientes variables debes agregarlas manualmente en Render > Environment:
+      # DATABASE_URL        → URL de tu PostgreSQL (Railway, Supabase, Neon, etc.)
+      # OPENAI_API_KEY      → Tu API Key de OpenAI
+      # JWT_SECRET          → Un string secreto largo y aleatorio
+      # FRONTEND_URL        → URL de tu frontend en Vercel (ej: https://jorana-ia.vercel.app)
+      # REDIS_URL           → URL de Redis (Railway, Upstash, etc.)
+      # MINIO_ENDPOINT      → Solo si usas MinIO externo; si no, omitir
