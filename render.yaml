@@ -1,7 +1,23 @@
 # render.yaml — Despliegue JORANA IA en Render.com
 # Repositorio: https://github.com/Looopxs/SISTEMA-DE-REVISION-DE-TESIS
 
+databases:
+  - name: jorana-db
+    databaseName: kimy_thesis
+    user: kimy
+    plan: free
+    region: oregon
+
 services:
+  # ============================================================
+  # REDIS EN LA NUBE (Render)
+  # ============================================================
+  - type: redis
+    name: jorana-redis
+    plan: free
+    region: oregon
+    ipAllowList: [] # Solo interno
+
   # ============================================================
   # BACKEND — NestJS API
   # ============================================================
@@ -29,14 +45,25 @@ services:
         value: production
       - key: API_PORT
         value: 10000
-      # === CONFIGURAR MANUALMENTE EN RENDER > ENVIRONMENT ===
-      # DATABASE_URL   → PostgreSQL de Neon (https://neon.tech) — gratis
-      # REDIS_URL      → Redis de Upstash (https://upstash.com) — gratis
-      # GEMINI_API_KEY → Tu API Key de Google AI Studio
-      # JWT_SECRET     → String aleatorio largo (mínimo 32 chars)
-      # FRONTEND_URL   → URL de Vercel, ej: https://jorana-ia.vercel.app
-      # ENCRYPTION_KEY → 64 chars hex aleatorio
-      # MINIO_ENDPOINT → Si usas Supabase Storage o similar
+      - key: FRONTEND_URL
+        value: "https://jorana-ia-web.onrender.com"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: jorana-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: jorana-redis
+          property: connectionString
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ENCRYPTION_KEY
+        sync: false
 
   # ============================================================
   # FRONTEND — Next.js Web
@@ -61,4 +88,4 @@ services:
       - key: NODE_ENV
         value: production
       - key: NEXT_PUBLIC_API_URL
-        value: "URL_DEL_BACKEND" # Cambia esto por la URL que te dé Render para tu backend (ej. https://jorana-ia-api.onrender.com)
+        value: "https://jorana-ia-api.onrender.com"
