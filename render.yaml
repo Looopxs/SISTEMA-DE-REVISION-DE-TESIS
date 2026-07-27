@@ -15,7 +15,7 @@ services:
     buildCommand: |
       cd ../..
       npm install --legacy-peer-deps
-      npx prisma generate --schema=packages/database/prisma/schema.prisma
+      npx prisma@6.3.0 generate --schema=packages/database/prisma/schema.prisma
       cd apps/api && npx nest build
 
     startCommand: node dist/main.js
