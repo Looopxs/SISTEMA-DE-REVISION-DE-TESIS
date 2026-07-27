@@ -37,6 +37,11 @@ services:
 
     startCommand: node dist/main.js
 
+    preDeployCommand: |
+      cd ../..
+      npx prisma@6.3.0 db push --schema=packages/database/prisma/schema.prisma --accept-data-loss
+      npm run db:seed
+
     healthCheckPath: /api/health
 
     envVars:
