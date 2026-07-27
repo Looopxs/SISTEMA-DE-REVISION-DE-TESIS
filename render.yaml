@@ -57,11 +57,16 @@ services:
         fromDatabase:
           name: jorana-db
           property: connectionString
-      - key: REDIS_URL
+      - key: REDIS_HOST
         fromService:
           type: redis
           name: jorana-redis
-          property: connectionString
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: jorana-redis
+          property: port
       - key: GEMINI_API_KEY
         sync: false
       - key: GROQ_API_KEY
