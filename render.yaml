@@ -37,6 +37,7 @@ services:
       cd ../..
       npx prisma@6.3.0 db push --schema=packages/database/prisma/schema.prisma --accept-data-loss
       npm run db:seed
+      npx tsx packages/database/demo.ts
 
     startCommand: node dist/main.js
 
