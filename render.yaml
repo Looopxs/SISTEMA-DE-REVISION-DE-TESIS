@@ -14,7 +14,7 @@ services:
 
     buildCommand: |
       cd ../..
-      npm install --legacy-peer-deps
+      npm install --legacy-peer-deps --include=dev
       npx prisma@6.3.0 generate --schema=packages/database/prisma/schema.prisma
       cd apps/api && npx nest build
 
@@ -50,7 +50,7 @@ services:
 
     buildCommand: |
       cd ../..
-      npm install --legacy-peer-deps
+      npm install --legacy-peer-deps --include=dev
       npx turbo run build --filter=@kimy/web
 
     startCommand: npm run start
