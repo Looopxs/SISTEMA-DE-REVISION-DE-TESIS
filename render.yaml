@@ -34,13 +34,11 @@ services:
       npx prisma@6.3.0 generate --schema=packages/database/prisma/schema.prisma
       cd packages/ai-engine && npx tsc
       cd ../../apps/api && npx nest build
-
-    startCommand: node dist/main.js
-
-    preDeployCommand: |
       cd ../..
       npx prisma@6.3.0 db push --schema=packages/database/prisma/schema.prisma --accept-data-loss
       npm run db:seed
+
+    startCommand: node dist/main.js
 
     healthCheckPath: /api/health
 
