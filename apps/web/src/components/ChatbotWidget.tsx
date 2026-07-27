@@ -19,8 +19,8 @@ interface Message {
 /* ── Speech recognition type shim ──────────────────────────── */
 declare global {
   interface Window {
-    SpeechRecognition: typeof SpeechRecognition | undefined;
-    webkitSpeechRecognition: typeof SpeechRecognition | undefined;
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
   }
 }
 
@@ -65,7 +65,7 @@ export default function ChatbotWidget() {
   const abortRef = useRef<AbortController | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<BlobPart[]>([]);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
 
   /* scroll to bottom */
   useEffect(() => {

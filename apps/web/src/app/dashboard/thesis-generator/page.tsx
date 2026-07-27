@@ -1207,7 +1207,8 @@ ${documentType === 'articulo' ? `
   <h1 class="portada" style="font-size: 14.0pt; margin-top: 30pt; border-top: 1.5pt solid black; border-bottom: 1.5pt solid black; padding: 10pt 0;">${thesisTitle ? thesisTitle.toUpperCase() : docTypeLabel}</h1>
   <h3 style="font-size: 11.0pt; text-align: center; font-style: italic; margin-bottom: 30pt; font-weight: normal;">${docTypeSubLabel}</h3>
   <p style="text-align: center; font-size: 12.0pt; margin-top: 20pt; line-height: 1.8;">
-    <strong>Autor:</strong> Br. ${authorName || '[Nombre del Autor]'}<br/>
+    <strong>Autor(es):</strong><br/>
+    ${authors.map(a => `Br. ${a.name || '[Nombre del Autor]'}`).join('<br/>')}<br/>
     <strong>Asesor:</strong> Dr. ${advisorName || '[Nombre del Asesor]'}<br/>
     <strong>Línea de investigación:</strong> ${researchLine}
   </p>

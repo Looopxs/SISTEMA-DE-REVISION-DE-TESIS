@@ -43,7 +43,7 @@ export default function SettingsPage() {
         alert('Error al iniciar la conexión con ORCID');
         setConnecting(false);
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
       alert('Error: ' + (e.response?.data?.message || e.message));
       setConnecting(false);

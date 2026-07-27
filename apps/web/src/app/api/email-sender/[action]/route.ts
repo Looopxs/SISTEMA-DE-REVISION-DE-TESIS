@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const API_URL = 'http://localhost:3001';
 
-export async function POST(req: NextRequest, { params }: { params: { action: string } }) {
-  const { action } = params;
+export async function POST(req: NextRequest, { params }: { params: Promise<{ action: string }> }) {
+  const { action } = await params;
   const body = await req.json().catch(() => ({}));
   const r = await fetch(`${API_URL}/api/email-sender/${action}`, {
     method: 'POST',
@@ -13,14 +13,14 @@ export async function POST(req: NextRequest, { params }: { params: { action: str
   return NextResponse.json(await r.json(), { status: r.status });
 }
 
-export async function GET(_req: NextRequest, { params }: { params: { action: string } }) {
-  const { action } = params;
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ action: string }> }) {
+  const { action } = await params;
   const r = await fetch(`${API_URL}/api/email-sender/${action}`);
   return NextResponse.json(await r.json(), { status: r.status });
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { action: string } }) {
-  const { action } = params;
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ action: string }> }) {
+  const { action } = await params;
   const r = await fetch(`${API_URL}/api/email-sender/${action}`, { method: 'DELETE' });
   return NextResponse.json(await r.json(), { status: r.status });
 }
