@@ -18,7 +18,9 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@kimy/ai-engine": ["../../packages/ai-engine/dist/index.d.ts"],
+      "@kimy/shared-types": ["../../packages/shared-types/index.ts"]
     }
   },
   "include": ["src/**/*"],

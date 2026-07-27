@@ -169,7 +169,7 @@ export class AiAnalysisService {
           processingMs: result.processingMs,
           modelUsed: process.env.AI_MODEL || 'gemini-1.5-pro',
           findings: {
-            create: result.findings.map((f) => ({
+            create: result.findings.map((f: any) => ({
               sectionRef: f.sectionRef,
               pageRef: f.pageRef,
               severity: f.severity as any,

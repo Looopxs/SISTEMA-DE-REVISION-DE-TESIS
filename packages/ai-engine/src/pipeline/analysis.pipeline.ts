@@ -5,7 +5,7 @@
 import { ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings } from '@langchain/google-genai';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import mammoth from 'mammoth';
-import pdfParse from 'pdf-parse';
+const pdfParse = require('pdf-parse');
 import { EVALUATION_PROMPT, REFERENCES_PROMPT, STRUCTURE_PROMPT } from '../prompts';
 import type { AnalysisResult, FindingOutput, ExtractedReference, TemplateSchema } from '../types';
 

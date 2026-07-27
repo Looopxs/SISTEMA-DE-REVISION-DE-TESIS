@@ -32,7 +32,8 @@ services:
       cd ../..
       npm install --legacy-peer-deps --include=dev
       npx prisma@6.3.0 generate --schema=packages/database/prisma/schema.prisma
-      cd apps/api && npx nest build
+      cd packages/ai-engine && npx tsc
+      cd ../../apps/api && npx nest build
 
     startCommand: node dist/main.js
 
