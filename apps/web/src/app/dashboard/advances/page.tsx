@@ -116,8 +116,8 @@ export default function AdvancesPage() {
     <div className="px-4 py-5 sm:p-6 space-y-5 sm:space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">Avances de Tesis</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{advances.length} avances registrados</p>
+          <h1 className="text-xl font-semibold text-[var(--text-primary)]">Avances de Tesis</h1>
+          <p className="text-sm text-[var(--text-muted)] mt-0.5">{advances.length} avances registrados</p>
         </div>
         <div className="flex gap-2">
           {pendingCount > 0 && (
@@ -162,7 +162,7 @@ export default function AdvancesPage() {
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               statusFilter === status
                 ? 'bg-primary-500 text-white'
-                : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                : 'bg-[var(--surface)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--surface-2)]'
             }`}
           >
             {status === 'ALL' ? 'Todos' : STATUS_CONFIG[status]?.label || status}
@@ -172,9 +172,9 @@ export default function AdvancesPage() {
 
       {/* Batch Review Bar */}
       {batchMode && selected.size > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3 animate-fade-in">
+        <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-color)] p-4 shadow-sm space-y-3 animate-fade-in">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="text-xs font-bold text-slate-700">{selected.size} avance(s) seleccionado(s)</span>
+            <span className="text-xs font-bold text-[var(--text-secondary)]">{selected.size} avance(s) seleccionado(s)</span>
             <div className="flex gap-1.5">
               {[
                 { id: 'APPROVED', l: '✓ Aprobar', c: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
@@ -201,7 +201,7 @@ export default function AdvancesPage() {
               value={batchComment}
               onChange={(e) => setBatchComment(e.target.value)}
               placeholder="Comentario opcional para todos..."
-              className="flex-1 px-3 py-2 text-xs rounded-lg border border-slate-200 focus:outline-none focus:border-primary-500"
+              className="flex-1 px-3 py-2 text-xs rounded-lg border border-[var(--border-color)] bg-[var(--surface-2)] text-[var(--text-primary)] focus:outline-none focus:border-primary-500"
             />
             <button
               onClick={submitBatchReview}
@@ -225,9 +225,9 @@ export default function AdvancesPage() {
             <div key={i} className="h-20 bg-white rounded-xl animate-pulse" />
           ))
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-xl border border-gray-100">
-            <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-sm text-gray-500">No hay avances registrados</p>
+          <div className="text-center py-16 bg-[var(--surface)] rounded-xl border border-[var(--border-color)]">
+            <FileText className="w-12 h-12 text-[var(--text-muted)] mx-auto mb-3" />
+            <p className="text-sm text-[var(--text-muted)]">No hay avances registrados</p>
           </div>
         ) : (
           filtered.map((advance) => {
@@ -239,10 +239,10 @@ export default function AdvancesPage() {
             return (
               <div
                 key={advance.id}
-                className={`flex items-center gap-3 sm:gap-4 p-4 bg-white rounded-xl border transition-all animate-fade-in ${
+                className={`flex items-center gap-3 sm:gap-4 p-4 bg-[var(--surface)] rounded-xl border transition-all animate-fade-in ${
                   batchMode && selected.has(advance.id)
-                    ? 'border-primary-300 bg-primary-50/30 shadow-sm'
-                    : 'border-gray-100 hover:shadow-sm hover:border-gray-200'
+                    ? 'border-primary-300 bg-primary-50/20 shadow-sm'
+                    : 'border-[var(--border-color)] hover:shadow-sm hover:border-[var(--border-color)]'
                 }`}
               >
                 {batchMode && (
@@ -260,14 +260,14 @@ export default function AdvancesPage() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium text-gray-900 truncate hover:text-primary-600 transition-colors">
+                      <p className="text-sm font-medium text-[var(--text-primary)] truncate hover:text-primary-600 transition-colors">
                         {advance.title}
                       </p>
                       <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${config.bg} ${config.color}`}>
                         {config.label}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className="text-xs text-[var(--text-muted)] mt-0.5">
                       {advance.student?.name || '—'} · {advance.advanceType} · v{advance.version}
                       {advance.program?.name ? ` · ${advance.program.name}` : ''}
                     </p>

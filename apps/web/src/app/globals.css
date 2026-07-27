@@ -15,8 +15,11 @@
   --primary: #185FA5;
   --primary-dark: #0C447C;
   --bg: #F8FAFC;
-  --sidebar-bg: #0F172A;
-  --sidebar-text: #94A3B8;
+  --sidebar-bg: #FFFFFF;
+  --sidebar-text: #475569;
+  --sidebar-text-hover: #0F172A;
+  --sidebar-border: #E2E8F0;
+  --sidebar-hover-bg: #F1F5F9;
   --sidebar-active: #185FA5;
 
   /* Card & surface */
@@ -39,6 +42,9 @@
   --bg: #0D1117;
   --sidebar-bg: #0A0F1A;
   --sidebar-text: #8B949E;
+  --sidebar-text-hover: #F0F6FC;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.05);
   --sidebar-active: #3B82F6;
 
   /* Card & surface */
@@ -95,6 +101,21 @@ html {
 .animate-fade-in { animation: fadeIn 0.3s ease-out; }
 .animate-slide-in { animation: slideIn 0.3s ease-out; }
 .animate-pulse-soft { animation: pulse-soft 2s infinite; }
+
+/* ============================
+   CHATBOT WIDGET ANIMATIONS
+   ============================ */
+@keyframes chatbotSlideUp {
+  from { opacity: 0; transform: translateY(16px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+@keyframes typing-dot {
+  0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+  40%           { transform: scale(1.2); opacity: 1; }
+}
+
+.chatbot-slide-up { animation: chatbotSlideUp 0.25s ease-out; }
 
 /* ============================
    SEVERITY BADGES (Light + Dark)
@@ -254,4 +275,60 @@ html {
 .dark .hover\:bg-gray-50:hover,
 .dark .hover\:bg-slate-50:hover {
   background-color: var(--surface-2) !important;
+}
+
+/* ============================
+   SELECT / INPUT DARK MODE FIX
+   ============================ */
+.dark select,
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark input[type="number"],
+.dark input[type="search"],
+.dark textarea {
+  background-color: var(--surface-2) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+.dark select option {
+  background-color: #1e2530 !important;
+  color: var(--text-primary) !important;
+}
+
+.dark select:focus,
+.dark input:focus,
+.dark textarea:focus {
+  border-color: var(--primary) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+}
+
+/* ============================
+   DIVIDE / BORDER DARK MODE
+   ============================ */
+.dark .divide-y > * {
+  border-color: var(--border-color) !important;
+}
+
+/* ============================
+   BG-WHITE CARDS DARK MODE
+   ============================ */
+.dark .bg-white\/50,
+.dark .bg-white\/30 {
+  background-color: rgba(22, 27, 34, 0.5) !important;
+}
+
+/* Placeholder text in dark mode */
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 1;
+}
+
+/* Search inputs and filter inputs */
+.dark input[placeholder] {
+  background-color: var(--surface-2) !important;
+  color: var(--text-primary) !important;
 }

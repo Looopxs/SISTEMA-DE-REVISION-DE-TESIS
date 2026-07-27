@@ -26,7 +26,9 @@ import {
   ClipboardCheck,
   UserCheck,
   Send,
-  Star
+  Star,
+  Printer,
+  Download
 } from 'lucide-react';
 
 const SEV: any = {
@@ -55,9 +57,28 @@ export default function AdvanceDetail() {
   const [reviewStatus, setReviewStatus] = useState('APPROVED');
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
 
   const fetchData = () => api.get(`/advances/${id}`).then(r => setD(r.data)).catch(console.error);
   useEffect(() => { fetchData(); }, [id]);
+
+  const downloadPdf = async () => {
+    setGeneratingPdf(true);
+    try {
+      const res = await api.get(`/reports/advance/${id}`);
+      const html = res.data.html;
+      const win = window.open('', '_blank');
+      if (!win) return;
+      win.document.write(html);
+      win.document.close();
+      win.focus();
+      setTimeout(() => win.print(), 500);
+    } catch (e) {
+      alert('Error al generar el PDF del reporte');
+    } finally {
+      setGeneratingPdf(false);
+    }
+  };
 
   const handleAction = async (action: string, url: string) => {
     setLoading(action);
@@ -155,6 +176,18 @@ export default function AdvanceDetail() {
                  d.status === 'PENDING' ? '⏳ Pendiente' :
                  d.status === 'HUMAN_REVIEW' ? '👁 En Revisión' : d.status}
               </span>
+              
+              {/* Botón Descargar PDF Reporte */}
+              {(d.status !== 'PENDING' && d.status !== 'AI_PROCESSING') && (
+                <button
+                  onClick={downloadPdf}
+                  disabled={generatingPdf}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 transition shadow-sm ml-2"
+                >
+                  {generatingPdf ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Printer className="w-3 h-3" />}
+                  {generatingPdf ? 'Generando...' : 'Descargar PDF'}
+                </button>
+              )}
             </div>
             <h1 className="text-2xl font-bold text-slate-900 leading-tight">{d.title}</h1>
             <p className="text-sm text-slate-500">

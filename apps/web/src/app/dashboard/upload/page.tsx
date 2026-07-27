@@ -35,7 +35,19 @@ export default function UploadPage() {
   // === Single Upload ===
   const handleSingleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file || !templateId) return;
+    if (!templateId) {
+      alert('Error: Debes seleccionar un Documento Patrón. Si no tienes ninguno, créalo primero.');
+      return;
+    }
+    if (!file) {
+      alert('Error: Debes adjuntar un archivo (Word o PDF) en el recuadro punteado.');
+      return;
+    }
+    if (!title.trim()) {
+      alert('Error: Debes escribir un título para el avance.');
+      return;
+    }
+
     setUploading(true);
     setMsg('');
     const fd = new FormData();
@@ -45,11 +57,11 @@ export default function UploadPage() {
     fd.append('templateId', templateId);
     try {
       const res = await api.post('/advances/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-      setMsg('✓ Avance subido. Iniciando análisis con Gemini IA...');
+      setMsg('✓ Avance subido. Iniciando análisis con JORANA IA...');
       // Auto-trigger AI analysis
       try {
         await api.post(`/ai-analysis/analyze/${res.data.id}`);
-        setMsg('✓ ¡Avance subido y analizado por Gemini IA exitosamente!');
+        setMsg('✓ ¡Avance subido y analizado por JORANA IA exitosamente!');
       } catch {
         setMsg('✓ Avance subido. El análisis IA se procesará en segundo plano.');
       }
@@ -86,7 +98,15 @@ export default function UploadPage() {
   };
 
   const runBatchUpload = async () => {
-    if (!templateId || batchFiles.length === 0) return;
+    if (batchFiles.length === 0) {
+      alert('Debes agregar al menos un archivo para la subida por lotes.');
+      return;
+    }
+    if (!templateId) {
+      alert('Debes seleccionar un Documento Patrón.');
+      return;
+    }
+
     setBatchRunning(true);
     setBatchDone(false);
 
@@ -118,7 +138,7 @@ export default function UploadPage() {
           await api.post(`/ai-analysis/analyze/${res.data.id}`);
           setBatchFiles((prev) =>
             prev.map((f, idx) =>
-              idx === i ? { ...f, status: 'done', result: '✓ Subido y analizado por Gemini' } : f,
+              idx === i ? { ...f, status: 'done', result: '✓ Subido y analizado por JORANA IA' } : f,
             ),
           );
         } catch {
@@ -155,9 +175,9 @@ export default function UploadPage() {
   return (
     <div className="px-4 py-5 sm:p-6 max-w-3xl mx-auto space-y-5">
       <div>
-        <h1 className="text-xl font-semibold text-gray-900">Subir Avances de Tesis</h1>
-        <p className="text-sm text-gray-500 mt-0.5">
-          Sube documentos Word o PDF para análisis automático con Gemini IA
+        <h1 className="text-xl font-semibold text-[var(--text-primary)]">Subir Avances de Tesis</h1>
+        <p className="text-sm text-[var(--text-muted)] mt-0.5">
+          Sube documentos Word o PDF para análisis automático con JORANA IA
         </p>
       </div>
 
@@ -186,15 +206,14 @@ export default function UploadPage() {
       </div>
 
       {/* Shared: Template selector */}
-      <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-xs">
-        <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+      <div className="bg-[var(--surface)] rounded-xl border border-[var(--border-color)] p-4 shadow-xs">
+        <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
           Documento Patrón (aplica a todos)
         </label>
         <select
           value={templateId}
           onChange={(e) => setTemplateId(e.target.value)}
-          className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none"
-          required
+          className="w-full px-4 py-2.5 rounded-lg border border-[var(--border-color)] bg-[var(--surface-2)] text-[var(--text-primary)] text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none"
         >
           <option value="">Seleccionar documento patrón...</option>
           {templates.map((t) => (
@@ -220,28 +239,27 @@ export default function UploadPage() {
             </div>
           )}
 
-          <form onSubmit={handleSingleUpload} className="bg-white rounded-xl border p-5 space-y-4">
+          <form onSubmit={handleSingleUpload} className="bg-[var(--surface)] rounded-xl border border-[var(--border-color)] p-5 space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+              <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
                 Título del avance
               </label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none"
+                className="w-full px-4 py-2.5 rounded-lg border border-[var(--border-color)] bg-[var(--surface-2)] text-[var(--text-primary)] text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none"
                 placeholder="Ej: Capítulo 1 - Marco Teórico"
-                required
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+              <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
                 Tipo de avance
               </label>
               <select
                 value={advanceType}
                 onChange={(e) => setAdvanceType(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm"
+                className="w-full px-4 py-2.5 rounded-lg border border-[var(--border-color)] bg-[var(--surface-2)] text-[var(--text-primary)] text-sm"
               >
                 {ADVANCE_TYPES.map((t) => (
                   <option key={t.value} value={t.value}>
@@ -278,7 +296,7 @@ export default function UploadPage() {
             </div>
             <button
               type="submit"
-              disabled={uploading || !file || !templateId}
+              disabled={uploading}
               className="w-full py-2.5 rounded-lg bg-primary-500 hover:bg-primary-600 text-white text-sm font-medium disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
             >
               {uploading ? (
@@ -287,7 +305,7 @@ export default function UploadPage() {
                 </>
               ) : (
                 <>
-                  <Brain className="w-4 h-4" /> Subir y analizar con Gemini IA
+                  <Brain className="w-4 h-4" /> Subir y analizar con JORANA IA
                 </>
               )}
             </button>
@@ -305,7 +323,7 @@ export default function UploadPage() {
               Selecciona varios archivos a la vez
             </p>
             <p className="text-xs text-primary-400 mt-0.5">
-              .docx o .pdf — Se analizarán automáticamente con Gemini IA
+              .docx o .pdf — Se analizarán automáticamente con JORANA IA
             </p>
             <input
               type="file"
@@ -336,7 +354,7 @@ export default function UploadPage() {
               {batchFiles.map((bf, i) => (
                 <div
                   key={i}
-                  className={`bg-white rounded-xl border p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-3 transition-all ${
+                  className={`bg-[var(--surface)] rounded-xl border p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-3 transition-all ${
                     bf.status === 'done'
                       ? 'border-emerald-200 bg-emerald-50/30'
                       : bf.status === 'error'
@@ -362,16 +380,16 @@ export default function UploadPage() {
                       value={bf.title}
                       onChange={(e) => updateBatchFile(i, 'title', e.target.value)}
                       disabled={bf.status !== 'pending'}
-                      className="w-full text-sm font-medium text-slate-800 bg-transparent border-b border-slate-200 focus:border-primary-500 outline-none pb-0.5 disabled:border-transparent"
+                      className="w-full text-sm font-medium text-[var(--text-primary)] bg-transparent border-b border-[var(--border-color)] focus:border-primary-500 outline-none pb-0.5 disabled:border-transparent"
                     />
-                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
                       <span>{bf.file.name}</span>
                       <span>({(bf.file.size / 1024 / 1024).toFixed(1)} MB)</span>
                       {bf.status === 'pending' && (
                         <select
                           value={bf.advanceType}
                           onChange={(e) => updateBatchFile(i, 'advanceType', e.target.value)}
-                          className="text-xs border border-slate-200 rounded px-1.5 py-0.5"
+                          className="text-xs border border-[var(--border-color)] bg-[var(--surface-2)] text-[var(--text-primary)] rounded px-1.5 py-0.5"
                         >
                           {ADVANCE_TYPES.map((t) => (
                             <option key={t.value} value={t.value}>
@@ -388,7 +406,7 @@ export default function UploadPage() {
                     )}
                     {bf.status === 'analyzing' && (
                       <p className="text-xs text-primary-600 font-medium animate-pulse">
-                        🤖 Gemini IA analizando estructura, contenido y originalidad...
+                        JORANA IA analizando estructura, contenido y originalidad...
                       </p>
                     )}
                   </div>
@@ -409,12 +427,12 @@ export default function UploadPage() {
               {!batchDone && (
                 <button
                   onClick={runBatchUpload}
-                  disabled={batchRunning || !templateId || batchFiles.filter(f => f.status === 'pending').length === 0}
+                  disabled={batchRunning}
                   className="w-full py-3 rounded-xl bg-gradient-to-r from-primary-500 to-indigo-500 hover:from-primary-600 hover:to-indigo-600 text-white text-sm font-semibold shadow-sm disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                 >
                   {batchRunning ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" /> Procesando lote con Gemini IA...
+                      <Loader2 className="w-4 h-4 animate-spin" /> Procesando lote con JORANA IA...
                     </>
                   ) : (
                     <>
@@ -428,7 +446,7 @@ export default function UploadPage() {
                 <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
                   <CheckCircle className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
                   <p className="text-sm font-bold text-emerald-800">
-                    ¡Lote completado! Todos los avances fueron procesados por Gemini IA.
+                    ¡Lote completado! Todos los avances fueron procesados por JORANA IA.
                   </p>
                   <p className="text-xs text-emerald-600 mt-1">
                     Puedes verlos en la sección de Avances de Tesis.

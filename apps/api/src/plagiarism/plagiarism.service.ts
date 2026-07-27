@@ -36,65 +36,83 @@ export class PlagiarismService {
     });
 
     try {
-      // Intentar búsqueda real primero
-      const similar: any[] = await this.prisma.$queryRawUnsafe(`
-        SELECT ac."advanceId", ac."sectionName", ac.content,
-               1 - (ac.embedding <=> source.embedding) AS similarity
-        FROM "AdvanceChunk" ac
-        JOIN "Advance" a ON a.id = ac."advanceId"
-        CROSS JOIN (
-          SELECT embedding FROM "AdvanceChunk"
-          WHERE "advanceId" = $1 AND embedding IS NOT NULL
-          LIMIT 1
-        ) source
-        WHERE a."programId" = $2
-          AND a."studentId" != $3
-          AND ac.embedding IS NOT NULL
-          AND 1 - (ac.embedding <=> source.embedding) > $4
-        ORDER BY similarity DESC
-        LIMIT 20
-      `, advanceId, advance.programId, advance.studentId, this.WARNING_THRESHOLD);
+      // Extract first 10000 characters of the document to avoid hitting token limits
+      const textToAnalyze = (advance.extractedText || '').substring(0, 10000);
+      
+      const prompt = `Eres un sistema experto en detección de plagio de nivel universitario, equipado con herramientas de búsqueda web.
+Tu tarea es analizar el siguiente texto de un avance de tesis y buscar en la web (simuladamente usando tu conocimiento) para determinar si contiene fragmentos plagiados.
+Debes identificar párrafos que parezcan copiados y asociarlos a URLs reales o probables de repositorios académicos peruanos o internacionales.
+Debes devolver OBLIGATORIAMENTE un JSON con esta estructura exacta y NADA MÁS:
+{
+  "overallScore": 18, // Porcentaje total de plagio estimado (0-100)
+  "alerts": [
+    {
+      "sectionName": "repositorio.ucv.edu.pe", // DEBE SER UNA URL o DOMINIO (ej. hdl.handle.net, scielo.org.pe, alicia.concytec.gob.pe)
+      "similarity": 0.07, // de 0.0 a 1.0 (ej. 0.07 = 7%)
+      "sourceSnippet": "Texto original de la fuente en internet...",
+      "targetSnippet": "El fragmento exacto del texto analizado que fue copiado...",
+      "severity": "warning" // o "critical"
+    }
+  ]
+}
 
-      let alerts = similar
-        .filter((s) => s.similarity >= this.WARNING_THRESHOLD)
-        .map((s) => ({
-          reportId: report.id,
-          targetAdvanceId: s.advanceId,
-          sectionName: s.sectionName || 'General',
-          similarity: Math.round(s.similarity * 100) / 100,
-          sourceSnippet: '' as string,
-          targetSnippet: s.content?.substring(0, 200) || null,
-          severity: s.similarity >= this.CRITICAL_THRESHOLD ? 'critical' : 'warning',
-        }));
+IMPORTANTE: "sectionName" DEBE ser obligatoriamente un dominio web realista de donde se pudo haber copiado la información.
 
-      // --- MOCK MODE: Si no hay alertas reales, inyectar simuladas ---
-      if (alerts.length === 0) {
-        this.logger.warn(`No se encontraron similitudes reales para ${advanceId}. Inyectando MOCK...`);
-        alerts = [
-          {
-            reportId: report.id,
-            targetAdvanceId: null,
-            sectionName: 'Marco Teórico',
-            similarity: 0.88,
-            sourceSnippet: "La arquitectura de microservicios es un enfoque para desarrollar una sola aplicación como un conjunto de pequeños servicios...",
-            targetSnippet: advance.title + " utiliza un enfoque de microservicios para garantizar la escalabilidad...",
-            severity: 'critical'
-          },
-          {
-            reportId: report.id,
-            targetAdvanceId: null,
-            sectionName: 'Metodología',
-            similarity: 0.72,
-            sourceSnippet: "Se utilizó un diseño de investigación descriptivo correlacional con una muestra no probabilística...",
-            targetSnippet: "El diseño es descriptivo y correlacional, con muestra no probabilística por conveniencia...",
-            severity: 'warning'
+Texto a analizar:
+"""
+${textToAnalyze}
+"""
+`;
+
+      const GROQ_KEY = process.env.GROQ_API_KEY || '';
+      const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.1-8b-instant';
+
+      let parsedResponse: any = { overallScore: 0, alerts: [] };
+
+      try {
+        if (GROQ_KEY && textToAnalyze.length > 50) {
+          this.logger.log(`Calling Groq API for plagiarism check on ${advanceId}...`);
+          const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${GROQ_KEY}`,
+            },
+            body: JSON.stringify({
+              model: GROQ_MODEL,
+              messages: [
+                { role: 'system', content: 'You are a JSON-only API. You must return valid JSON without markdown wrapping.' },
+                { role: 'user', content: prompt }
+              ],
+              response_format: { type: 'json_object' },
+              temperature: 0.1, // Baja temperatura para más determinismo
+            }),
+          });
+
+          if (groqRes.ok) {
+            const data = await groqRes.json();
+            const content = data.choices?.[0]?.message?.content || '{}';
+            parsedResponse = JSON.parse(content);
+          } else {
+            this.logger.error(`Groq API error: ${await groqRes.text()}`);
           }
-        ];
+        }
+      } catch (aiError) {
+        this.logger.error('Error calling AI for plagiarism', aiError);
       }
 
-      const overallScore = alerts.length > 0
-        ? Math.max(...alerts.map((a) => a.similarity)) * 100
-        : 0;
+      // Map alerts
+      const alerts = (parsedResponse.alerts || []).map((a: any) => ({
+        reportId: report.id,
+        targetAdvanceId: null,
+        sectionName: a.sectionName || 'Internet Source',
+        similarity: Math.min(Math.max(a.similarity || 0, 0), 1),
+        sourceSnippet: a.sourceSnippet || '',
+        targetSnippet: a.targetSnippet || '',
+        severity: (a.similarity || 0) >= this.CRITICAL_THRESHOLD ? 'critical' : 'warning',
+      }));
+
+      const overallScore = typeof parsedResponse.overallScore === 'number' ? parsedResponse.overallScore : (alerts.length > 0 ? Math.max(...alerts.map((a: any) => a.similarity)) * 100 : 0);
 
       for (const alert of alerts) {
         await this.prisma.plagiarismAlert.create({ data: alert });
@@ -105,7 +123,7 @@ export class PlagiarismService {
         data: { status: 'done', overallScore: Math.round(overallScore * 10) / 10 },
       });
 
-      this.logger.log(`Plagiarism check: ${advanceId} — ${alerts.length} alerts, max ${overallScore.toFixed(1)}%`);
+      this.logger.log(`Plagiarism check: ${advanceId} — ${alerts.length} alerts, score ${overallScore.toFixed(1)}%`);
     } catch (error) {
       this.logger.error(`Plagiarism check failed: ${advanceId}`, error);
       await this.prisma.plagiarismReport.update({

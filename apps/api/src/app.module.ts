@@ -14,8 +14,12 @@ import { ReportsModule } from './reports/reports.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { StorageModule } from './storage/storage.module';
+import { ThesisGeneratorModule } from './thesis-generator/thesis-generator.module';
+import { ArticleReviewerModule } from './article-reviewer/article-reviewer.module';
+import { EmailSenderModule } from './email-sender/email-sender.module';
 import { ProgramsController } from './programs/programs.controller';
 import { BullModule } from '@nestjs/bullmq';
+import { AudioModule } from './audio/audio.module';
 
 @Module({
   imports: [
@@ -23,6 +27,9 @@ import { BullModule } from '@nestjs/bullmq';
       connection: {
         host: process.env.REDIS_HOST || 'localhost',
         port: parseInt(process.env.REDIS_PORT || '6379'),
+        lazyConnect: true,
+        enableOfflineQueue: false,
+        maxRetriesPerRequest: null,
       },
     }),
     PrismaModule,
@@ -40,6 +47,10 @@ import { BullModule } from '@nestjs/bullmq';
     DashboardModule,
     NotificationsModule,
     StorageModule,
+    ThesisGeneratorModule,
+    ArticleReviewerModule,
+    EmailSenderModule,
+    AudioModule,
   ],
   controllers: [ProgramsController],
 })

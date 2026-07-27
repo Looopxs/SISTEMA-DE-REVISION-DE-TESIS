@@ -15,19 +15,19 @@ async function bootstrap() {
   // CORS — permitir acceso desde localhost, red local y Tailscale
   app.enableCors({
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-      // Permitir peticiones sin origin (curl, Postman, SSR)
       if (!origin) return callback(null, true);
-      // Permitir localhost, IPs privadas (192.168.x.x, 10.x.x.x) y Tailscale (100.x.x.x)
+      // Localhost y redes privadas
       if (
         origin.includes('localhost') ||
-        origin.match(/^https?:\/\/(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.|100\.)/)
-      ) {
-        return callback(null, true);
-      }
-      // Permitir FRONTEND_URL si está configurado
-      if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) {
-        return callback(null, true);
-      }
+        /^https?:\/\/(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.|100\.)/.test(origin)
+      ) return callback(null, true);
+      // Produccion: Vercel, Render y FRONTEND_URL
+      const allowed = [process.env.FRONTEND_URL].filter(Boolean);
+      if (
+        allowed.includes(origin) ||
+        origin.endsWith('.vercel.app') ||
+        origin.endsWith('.onrender.com')
+      ) return callback(null, true);
       callback(null, false);
     },
     credentials: true,
@@ -66,10 +66,15 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  const port = process.env.API_PORT || 3001;
-  await app.listen(port);
-  console.log(`\n🚀 KIMY API running on http://localhost:${port}`);
-  console.log(`📚 Swagger docs: http://localhost:${port}/api/docs\n`);
+  // Health check para Render
+  app.getHttpAdapter().get('/api/health', (_req, res) => {
+    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
+  const port = process.env.PORT || process.env.API_PORT || 3001;
+  await app.listen(port, '0.0.0.0');
+  console.log(`\nJORANA IA API corriendo en http://0.0.0.0:${port}`);
+  console.log(`Swagger docs: http://0.0.0.0:${port}/api/docs\n`);
 }
 
 bootstrap().catch((err) => {

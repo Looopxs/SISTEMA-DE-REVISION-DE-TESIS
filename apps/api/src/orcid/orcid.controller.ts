@@ -11,7 +11,6 @@ export class OrcidController {
   @Get('connect')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @Redirect()
   connect(@Request() req: any) {
     const url = this.orcidService.getAuthorizationUrl(req.user.sub);
     return { url };

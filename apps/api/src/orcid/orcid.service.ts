@@ -11,10 +11,10 @@ export class OrcidService {
   getAuthorizationUrl(userId: string): string {
     const state = `${userId}:${crypto.randomBytes(16).toString('hex')}`;
     const params = new URLSearchParams({
-      client_id: process.env.ORCID_CLIENT_ID || '',
+      client_id: (process.env.ORCID_CLIENT_ID || 'APP-ULPAEU8YM62BXQ7Y').trim(),
       response_type: 'code',
-      scope: '/authenticate /read-limited',
-      redirect_uri: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/orcid/callback`,
+      scope: '/authenticate',
+      redirect_uri: 'https://jorana-ai.com/api/orcid/callback',
       state,
     });
     return `https://orcid.org/oauth/authorize?${params.toString()}`;
@@ -27,11 +27,11 @@ export class OrcidService {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        client_id: process.env.ORCID_CLIENT_ID || '',
-        client_secret: process.env.ORCID_CLIENT_SECRET || '',
+        client_id: (process.env.ORCID_CLIENT_ID || 'APP-ULPAEU8YM62BXQ7Y').trim(),
+        client_secret: (process.env.ORCID_CLIENT_SECRET || '84484826-b841-4a98-a3d8-ca4f8afaab67').trim(),
         grant_type: 'authorization_code',
         code,
-        redirect_uri: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/orcid/callback`,
+        redirect_uri: 'https://jorana-ai.com/api/orcid/callback',
       }),
     });
 

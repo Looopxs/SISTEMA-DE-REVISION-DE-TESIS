@@ -1,33 +1,60 @@
-# render.yaml — Configuración de despliegue en Render.com
-# Repositorio: https://github.com/Looopxs/LAB01_HLJA
+# render.yaml — Despliegue JORANA IA en Render.com
+# Repositorio: https://github.com/Looopxs/SISTEMA-DE-REVISION-DE-TESIS
 
 services:
   # ============================================================
-  # BACKEND — NestJS API (Web Service en Render)
+  # BACKEND — NestJS API
   # ============================================================
   - type: web
     name: jorana-ia-api
     runtime: node
-    region: oregon          # Región más cercana a Latinoamérica disponible en plan gratis
+    region: oregon
     plan: free
+    rootDir: apps/api
 
-    # Render ejecuta los comandos desde la RAÍZ del repositorio
     buildCommand: |
-      npm install
+      cd ../..
+      npm install --legacy-peer-deps
+      npx prisma generate --schema=packages/database/prisma/schema.prisma
       cd apps/api && npx nest build
 
-    startCommand: node apps/api/dist/main.js
+    startCommand: node dist/main.js
 
-    # Variables de entorno que debes configurar en el dashboard de Render:
+    healthCheckPath: /api/health
+
     envVars:
       - key: NODE_ENV
         value: production
       - key: API_PORT
-        value: 3001
-      # Las siguientes variables debes agregarlas manualmente en Render > Environment:
-      # DATABASE_URL        → URL de tu PostgreSQL (Railway, Supabase, Neon, etc.)
-      # OPENAI_API_KEY      → Tu API Key de OpenAI
-      # JWT_SECRET          → Un string secreto largo y aleatorio
-      # FRONTEND_URL        → URL de tu frontend en Vercel (ej: https://jorana-ia.vercel.app)
-      # REDIS_URL           → URL de Redis (Railway, Upstash, etc.)
-      # MINIO_ENDPOINT      → Solo si usas MinIO externo; si no, omitir
+        value: 10000
+      # === CONFIGURAR MANUALMENTE EN RENDER > ENVIRONMENT ===
+      # DATABASE_URL   → PostgreSQL de Neon (https://neon.tech) — gratis
+      # REDIS_URL      → Redis de Upstash (https://upstash.com) — gratis
+      # GEMINI_API_KEY → Tu API Key de Google AI Studio
+      # JWT_SECRET     → String aleatorio largo (mínimo 32 chars)
+      # FRONTEND_URL   → URL de Vercel, ej: https://jorana-ia.vercel.app
+      # ENCRYPTION_KEY → 64 chars hex aleatorio
+      # MINIO_ENDPOINT → Si usas Supabase Storage o similar
+
+  # ============================================================
+  # FRONTEND — Next.js Web
+  # ============================================================
+  - type: web
+    name: jorana-ia-web
+    runtime: node
+    region: oregon
+    plan: free
+    rootDir: apps/web
+
+    buildCommand: |
+      cd ../..
+      npm install --legacy-peer-deps
+      npx turbo run build --filter=@kimy/web
+
+    startCommand: npm run start
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        value: "URL_DEL_BACKEND" # Cambia esto por la URL que te dé Render para tu backend (ej. https://jorana-ia-api.onrender.com)

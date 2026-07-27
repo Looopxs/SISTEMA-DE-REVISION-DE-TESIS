@@ -28,12 +28,12 @@ export class TemplatesController {
   }
 
   @Post('upload')
-  @Roles('COORDINATOR', 'ADMIN')
+  @Roles('COORDINATOR', 'ADMIN', 'ADVISOR', 'STUDENT')
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 50 * 1024 * 1024 } }))
   upload(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() body: { programId: string; name: string; version: string; citationStyle?: string },
+    @UploadedFile() file: Express.Multer.File | undefined,
+    @Body() body: { programId: string; name: string; version: string; citationStyle?: string; rawText?: string },
   ) {
     return this.templatesService.upload(file, body);
   }
